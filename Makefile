@@ -2,7 +2,7 @@ DESTDIR=/usr
 ROOTDIR=$(DESTDIR)
 LIBDIR=/usr/lib
 SBINDIR=/sbin
-#MANDIR=/share/man
+MANDIR=/share/man
 
 CC = gcc
 HOSTCC = gcc
@@ -24,9 +24,8 @@ all:
 install: all
 	install -m 0755 -d $(DESTDIR)$(SBINDIR)
 	@for i in $(SUBDIRS); do $(MAKE) -C $$i install; done
-#	install -m 0755 -d $(DESTDIR)$(MANDIR)/man8
-#	install -m 0644 $(shell find man/man8 -maxdepth 1 -type f) $(DESTDIR)$(MANDIR)/man8
-#	ln -sf crconf.8  $(DESTDIR)$(MANDIR)/man8/crconf.8
+	install -m 0755 -d $(DESTDIR)$(MANDIR)/man8
+	install -m 0644 $(shell find man/man8 -maxdepth 1 -type f) $(DESTDIR)$(MANDIR)/man8
 
 clean:
 	@for i in $(SUBDIRS); \
