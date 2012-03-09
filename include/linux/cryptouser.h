@@ -92,17 +92,12 @@ enum crypto_attr_type_t {
 	CRYPTOCFGA_UNSPEC,
 	CRYPTOCFGA_PRIORITY_VAL,	/* __u32 */
 	CRYPTOCFGA_REPORT_LARVAL,       /* struct crypto_report_larval */
-	CRYPTOCFGA_REPORT_SHASH,        /* struct crypto_report_hash */
-	CRYPTOCFGA_REPORT_AHASH,	/* struct crypto_report_hash */
+	CRYPTOCFGA_REPORT_HASH,        /* struct crypto_report_hash */
 	CRYPTOCFGA_REPORT_BLKCIPHER,	/* struct crypto_report_blkcipher */
-	CRYPTOCFGA_REPORT_ABLKCIPHER,	/* struct crypto_report_blkcipher */
-	CRYPTOCFGA_REPORT_GIVCIPHER,	/* struct crypto_report_blkcipher */
 	CRYPTOCFGA_REPORT_AEAD,		/* struct crypto_report_aead */
-	CRYPTOCFGA_REPORT_NIVAEAD,	/* struct crypto_report_aead */
-	CRYPTOCFGA_REPORT_PCOMPRESS,	/* struct crypto_report_comp */
+	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
-	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
 	__CRYPTOCFGA_MAX
 
 #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
@@ -115,7 +110,6 @@ struct crypto_user_alg {
 	char cru_module_name[CRYPTO_MAX_ALG_NAME];
 	__u32 cru_type;
 	__u32 cru_mask;
-	__u32 cru_priority;
 	__u32 cru_refcnt;
 	__u32 cru_flags;
 };

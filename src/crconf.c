@@ -390,16 +390,10 @@ static void crypto_alg_print_attr(struct rtattr *tb[], FILE *fp)
 		crypto_print_larval(rl, fp);
 	}
 
-	if (tb[CRYPTOCFGA_REPORT_SHASH]) {
-		struct rtattr *rta = tb[CRYPTOCFGA_REPORT_SHASH];
+	if (tb[CRYPTOCFGA_REPORT_HASH]) {
+		struct rtattr *rta = tb[CRYPTOCFGA_REPORT_HASH];
 		struct crypto_report_hash *rsh = (struct crypto_report_hash *) RTA_DATA(rta);
 		crypto_print_hash(rsh, fp);
-	}
-
-	if (tb[CRYPTOCFGA_REPORT_AHASH]) {
-		struct rtattr *rta = tb[CRYPTOCFGA_REPORT_AHASH];
-		struct crypto_report_hash *rah = (struct crypto_report_hash *) RTA_DATA(rta);
-		crypto_print_hash(rah, fp);
 	}
 
 	if (tb[CRYPTOCFGA_REPORT_BLKCIPHER]) {
@@ -408,34 +402,10 @@ static void crypto_alg_print_attr(struct rtattr *tb[], FILE *fp)
 		crypto_print_blkcipher(rblk, fp);
 	}
 
-	if (tb[CRYPTOCFGA_REPORT_ABLKCIPHER]) {
-		struct rtattr *rta = tb[CRYPTOCFGA_REPORT_ABLKCIPHER];
-		struct crypto_report_blkcipher *rablk = (struct crypto_report_blkcipher *) RTA_DATA(rta);
-		crypto_print_blkcipher(rablk, fp);
-	}
-
-	if (tb[CRYPTOCFGA_REPORT_GIVCIPHER]) {
-		struct rtattr *rta = tb[CRYPTOCFGA_REPORT_GIVCIPHER];
-		struct crypto_report_blkcipher *rablk = (struct crypto_report_blkcipher *) RTA_DATA(rta);
-		crypto_print_blkcipher(rablk, fp);
-	}
-
 	if (tb[CRYPTOCFGA_REPORT_AEAD]) {
 		struct rtattr *rta = tb[CRYPTOCFGA_REPORT_AEAD];
 		struct crypto_report_aead *raead = (struct crypto_report_aead *) RTA_DATA(rta);
 		crypto_print_aead(raead, fp);
-	}
-
-	if (tb[CRYPTOCFGA_REPORT_NIVAEAD]) {
-		struct rtattr *rta = tb[CRYPTOCFGA_REPORT_NIVAEAD];
-		struct crypto_report_aead *raead = (struct crypto_report_aead *) RTA_DATA(rta);
-		crypto_print_aead(raead, fp);
-	}
-
-	if (tb[CRYPTOCFGA_REPORT_PCOMPRESS]) {
-		struct rtattr *rta = tb[CRYPTOCFGA_REPORT_PCOMPRESS];
-		struct crypto_report_comp *rcomp = (struct crypto_report_comp *) RTA_DATA(rta);
-		crypto_print_comp(rcomp, fp);
 	}
 
 	if (tb[CRYPTOCFGA_REPORT_RNG]) {
