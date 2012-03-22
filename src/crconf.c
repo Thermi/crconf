@@ -135,7 +135,7 @@ int crconf_update(int argc, char **argv)
 
 static int crconf_del_alg(int argc, char **argv)
 {
-	fprintf(stderr, "'del alg' is not implementd, try 'del driver' instead");
+	fprintf(stderr, "'del alg' is not implementd, try 'del driver' instead.\n");
 	exit(-1);
 }
 
