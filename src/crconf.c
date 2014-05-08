@@ -93,6 +93,16 @@ static void invarg(const char *msg, const char *arg)
 	exit(-1);
 }
 
+static void copy_name(char *dst, char *src, size_t maxlen)
+{
+	if (strlen(src) >= maxlen) {
+		fprintf(stderr, "Algorithm/Driver name '%s' too long, max "
+			"length %zu!\n", src, maxlen - 1);
+		exit(-1);
+	}
+	strncpy(dst, src, strlen(src));
+}
+
 int crconf_update_driver(int argc, char **argv)
 {
 	struct rtnl_handle rth;
@@ -112,7 +122,8 @@ int crconf_update_driver(int argc, char **argv)
 	req.n.nlmsg_type = CRYPTO_MSG_UPDATEALG;
 
 	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
-	strncpy(req.cru.cru_driver_name, argv[0], strlen(argv[0]));
+	copy_name(req.cru.cru_driver_name, argv[0],
+		  sizeof(req.cru.cru_driver_name));
 	argc--;
 	argv++;
 
@@ -179,7 +190,8 @@ static int crconf_del_driver(int argc, char **argv)
 	req.n.nlmsg_type = CRYPTO_MSG_DELALG;
 
 	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
-	strncpy(req.cru.cru_driver_name, argv[0], strlen(argv[0]));
+	copy_name(req.cru.cru_driver_name, argv[0],
+		  sizeof(req.cru.cru_driver_name));
 	argc--;
 	argv++;
 
@@ -236,7 +248,7 @@ static int crconf_add_alg(int argc, char **argv)
 	req.n.nlmsg_type = CRYPTO_MSG_NEWALG;
 
 	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
-	strncpy(req.cru.cru_name, argv[0], strlen(argv[0]));
+	copy_name(req.cru.cru_name, argv[0], sizeof(req.cru.cru_name));
 	argc--;
 	argv++;
 
@@ -282,7 +294,8 @@ static int crconf_add_driver(int argc, char **argv)
 	req.n.nlmsg_type = CRYPTO_MSG_NEWALG;
 
 	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
-	strncpy(req.cru.cru_driver_name, argv[0], strlen(argv[0]));
+	copy_name(req.cru.cru_driver_name, argv[0],
+		 sizeof(req.cru.cru_driver_name));
 	argc--;
 	argv++;
 
@@ -523,7 +536,8 @@ static int crconf_show_driver(int argc, char **argv)
 	req.n.nlmsg_type = CRYPTO_MSG_GETALG;
 
 	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
-	strncpy(req.cru.cru_driver_name, argv[0], strlen(argv[0]));
+	copy_name(req.cru.cru_driver_name, argv[0],
+		  sizeof(req.cru.cru_driver_name));
 
 	argc--;
 	argv++;
