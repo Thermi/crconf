@@ -73,7 +73,7 @@ static int matches(const char *cmd, const char *pattern)
 	return memcmp(pattern, cmd, len);
 }
 
-static int get_u32(__u32 *val, const char *arg, int base)
+static int __get_u32(__u32 *val, const char *arg, int base)
 {
 	unsigned long res;
 	char *ptr;
@@ -87,10 +87,25 @@ static int get_u32(__u32 *val, const char *arg, int base)
 	return 0;
 }
 
-static void invarg(const char *msg, const char *arg)
+static void invarg(const char *arg)
 {
-	fprintf(stderr, "Error: argument \"%s\" is wrong: %s\n", arg, msg);
-	exit(-1);
+	fprintf(stderr, "Error: invalid argument \"%s\"\n", arg);
+	usage();
+}
+
+static void get_u32(int *pargc, char ***pargv, __u32 *val, const char *what)
+{
+	(*pargc)--;
+	(*pargv)++;
+	if (!*pargc) {
+		fprintf(stderr, "Error: \"%s\" requires an argument\n", what);
+		exit(-1);
+	}
+	if (__get_u32(val, **pargv, 0)) {
+		fprintf(stderr, "Error: \"%s\" argument \"%s\" is wrong\n",
+			what, **pargv);
+		exit(-1);
+	}
 }
 
 static void copy_name(char *dst, char *src, size_t maxlen)
@@ -128,18 +143,14 @@ int crconf_update_driver(int argc, char **argv)
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0) {
-			argc--;
-			argv++;
-			req.cru.cru_type = atoi(argv[0]);
-		} else if (strcmp(*argv, "priority") == 0) {
+		if (strcmp(*argv, "type") == 0)
+			get_u32(&argc, &argv, &req.cru.cru_type, "type");
+		else if (strcmp(*argv, "priority") == 0) {
 			__u32 prio;
-			argc--;
-			argv++;
-			if (get_u32(&prio, *argv, 0))
-				invarg("\"priority\" value is invalid\n", *argv);
+			get_u32(&argc, &argv, &prio, "priority");
 			addattr32(&req.n, sizeof(req), CRYPTOCFGA_PRIORITY_VAL, prio);
-		}
+		} else
+			invarg(*argv);
 
 		argc--;
 		argv++;
@@ -196,11 +207,10 @@ static int crconf_del_driver(int argc, char **argv)
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0) {
-			argc--;
-			argv++;
-			req.cru.cru_type = atoi(argv[0]);
-		}
+		if (strcmp(*argv, "type") == 0)
+			get_u32(&argc, &argv, &req.cru.cru_type, "type");
+		else
+			invarg(*argv);
 
 		argc--;
 		argv++;
@@ -253,11 +263,10 @@ static int crconf_add_alg(int argc, char **argv)
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0) {
-			argc--;
-			argv++;
-			req.cru.cru_type = atoi(argv[0]);
-		}
+		if (strcmp(*argv, "type") == 0)
+			get_u32(&argc, &argv, &req.cru.cru_type, "type");
+		else
+			invarg(*argv);
 
 		argc--;
 		argv++;
@@ -300,18 +309,14 @@ static int crconf_add_driver(int argc, char **argv)
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0) {
-			argc--;
-			argv++;
-			req.cru.cru_type = atoi(argv[0]);
-		} else if (strcmp(*argv, "priority") == 0) {
+		if (strcmp(*argv, "type") == 0)
+			get_u32(&argc, &argv, &req.cru.cru_type, "type");
+		else if (strcmp(*argv, "priority") == 0) {
 			__u32 prio;
-			argc--;
-			argv++;
-			if (get_u32(&prio, *argv, 0))
-				invarg("\"priority\" value is invalid\n", *argv);
+			get_u32(&argc, &argv, &prio, "priority");
 			addattr32(&req.n, sizeof(req), CRYPTOCFGA_PRIORITY_VAL, prio);
-		}
+		} else
+			invarg(*argv);
 
 		argc--;
 		argv++;
@@ -543,11 +548,10 @@ static int crconf_show_driver(int argc, char **argv)
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0) {
-			argc--;
-			argv++;
-			req.cru.cru_type = atoi(argv[0]);
-		}
+		if (strcmp(*argv, "type") == 0)
+			get_u32(&argc, &argv, &req.cru.cru_type, "type");
+		else
+			invarg(*argv);
 
 		argc--;
 		argv++;
