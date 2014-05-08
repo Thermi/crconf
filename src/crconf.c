@@ -33,7 +33,28 @@ static void usage(void) __attribute__((noreturn));
 static void usage(void)
 {
 	fprintf(stderr,
-"Usage: crconf { COMMAND [ add | del | update ] [ alg | driver ] [ ALG | ALG_DRIVER ] [ type | priority ] } | show [ all | ALG_DRIVER ] | help \n");
+			"Usage: crconf add { ALG | DRIVER } TYPE [ PRIORITY ]\n"
+			"       crconf del DRIVER TYPE\n"
+			"       crconf update DRIVER TYPE [ PRIORITY ]\n"
+			"       crconf show { DRIVER TYPE | all }\n"
+			"       crconf help\n"
+			"ALG := alg <alg-name>\n"
+			"DRIVER := driver <driver-name>\n"
+			"TYPE := type ALGO-TYPE\n"
+			"PRIORITY := priority <number>\n"
+			"ALGO-TYPE := { 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 12 | 15 }\n"
+			"               1 == alg type cipher\n"
+			"               2 == alg type compress\n"
+			"               3 == alg type aead\n"
+			"               4 == alg type blkcipher\n"
+			"               5 == alg type ablkcipher\n"
+			"               6 == alg type givcipher\n"
+			"               8 == alg type digest\n"
+			"               8 == alg type hash\n"
+			"               9 == alg type shash\n"
+			"              10 == alg type ahash\n"
+			"              12 == alg type rng\n"
+			"              15 == alg type pcompress\n");
 	exit(-1);
 }
 
