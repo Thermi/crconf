@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  * Crypto user configuration API.
  *
@@ -27,23 +28,28 @@
 /*  
  * Algorithm masks and types. 
  */ 
-#define CRYPTO_ALG_TYPE_MASK            0x0000000f
-#define CRYPTO_ALG_TYPE_CIPHER          0x00000001
-#define CRYPTO_ALG_TYPE_COMPRESS        0x00000002
-#define CRYPTO_ALG_TYPE_AEAD            0x00000003
-#define CRYPTO_ALG_TYPE_BLKCIPHER       0x00000004
-#define CRYPTO_ALG_TYPE_ABLKCIPHER      0x00000005
-#define CRYPTO_ALG_TYPE_GIVCIPHER       0x00000006
-#define CRYPTO_ALG_TYPE_DIGEST          0x00000008
-#define CRYPTO_ALG_TYPE_HASH            0x00000008
-#define CRYPTO_ALG_TYPE_SHASH           0x00000009
-#define CRYPTO_ALG_TYPE_AHASH           0x0000000a
-#define CRYPTO_ALG_TYPE_RNG             0x0000000c
-#define CRYPTO_ALG_TYPE_PCOMPRESS       0x0000000f
+#define CRYPTO_ALG_TYPE_MASK		0x0000000f
+#define CRYPTO_ALG_TYPE_CIPHER		0x00000001
+#define CRYPTO_ALG_TYPE_COMPRESS	0x00000002
+#define CRYPTO_ALG_TYPE_AEAD		0x00000003
+#define CRYPTO_ALG_TYPE_BLKCIPHER	0x00000004
+#define CRYPTO_ALG_TYPE_ABLKCIPHER	0x00000005
+#define CRYPTO_ALG_TYPE_SKCIPHER	0x00000005
+#define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
+#define CRYPTO_ALG_TYPE_KPP		0x00000008
+#define CRYPTO_ALG_TYPE_ACOMPRESS	0x0000000a
+#define CRYPTO_ALG_TYPE_SCOMPRESS	0x0000000b
+#define CRYPTO_ALG_TYPE_RNG		0x0000000c
+#define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
+#define CRYPTO_ALG_TYPE_DIGEST		0x0000000e
+#define CRYPTO_ALG_TYPE_HASH		0x0000000e
+#define CRYPTO_ALG_TYPE_SHASH		0x0000000e
+#define CRYPTO_ALG_TYPE_AHASH		0x0000000f
 
-#define CRYPTO_ALG_TYPE_HASH_MASK       0x0000000e
-#define CRYPTO_ALG_TYPE_AHASH_MASK      0x0000000c
-#define CRYPTO_ALG_TYPE_BLKCIPHER_MASK  0x0000000c
+#define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
+#define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000e
+#define CRYPTO_ALG_TYPE_BLKCIPHER_MASK	0x0000000c
+#define CRYPTO_ALG_TYPE_ACOMPRESS_MASK	0x0000000e
 
 #define CRYPTO_ALG_LARVAL		0x00000010
 #define CRYPTO_ALG_DEAD			0x00000020
@@ -82,39 +88,42 @@ enum {
 	CRYPTO_MSG_DELALG,
 	CRYPTO_MSG_UPDATEALG,
 	CRYPTO_MSG_GETALG,
+	CRYPTO_MSG_DELRNG,
 	__CRYPTO_MSG_MAX
 };
 #define CRYPTO_MSG_MAX (__CRYPTO_MSG_MAX - 1)
 #define CRYPTO_NR_MSGTYPES (CRYPTO_MSG_MAX + 1 - CRYPTO_MSG_BASE)
 
+#define CRYPTO_MAX_NAME 64
+
 /* Netlink message attributes.  */
 enum crypto_attr_type_t {
 	CRYPTOCFGA_UNSPEC,
 	CRYPTOCFGA_PRIORITY_VAL,	/* __u32 */
-	CRYPTOCFGA_REPORT_LARVAL,       /* struct crypto_report_larval */
-	CRYPTOCFGA_REPORT_HASH,        /* struct crypto_report_hash */
+	CRYPTOCFGA_REPORT_LARVAL,	/* struct crypto_report_larval */
+	CRYPTOCFGA_REPORT_HASH,		/* struct crypto_report_hash */
 	CRYPTOCFGA_REPORT_BLKCIPHER,	/* struct crypto_report_blkcipher */
 	CRYPTOCFGA_REPORT_AEAD,		/* struct crypto_report_aead */
 	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
+	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
+	CRYPTOCFGA_REPORT_KPP,		/* struct crypto_report_kpp */
+	CRYPTOCFGA_REPORT_ACOMP,	/* struct crypto_report_acomp */
 	__CRYPTOCFGA_MAX
 
 #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
 };
 
-
 struct crypto_user_alg {
-	char cru_name[CRYPTO_MAX_ALG_NAME];
-	char cru_driver_name[CRYPTO_MAX_ALG_NAME];
-	char cru_module_name[CRYPTO_MAX_ALG_NAME];
+	char cru_name[CRYPTO_MAX_NAME];
+	char cru_driver_name[CRYPTO_MAX_NAME];
+	char cru_module_name[CRYPTO_MAX_NAME];
 	__u32 cru_type;
 	__u32 cru_mask;
 	__u32 cru_refcnt;
 	__u32 cru_flags;
 };
-
-#define CRYPTO_MAX_NAME CRYPTO_MAX_ALG_NAME
 
 struct crypto_report_larval {
 	char type[CRYPTO_MAX_NAME];
@@ -158,6 +167,21 @@ struct crypto_report_rng {
 	char type[CRYPTO_MAX_NAME];
 	unsigned int seedsize;
 };
+
+struct crypto_report_akcipher {
+	char type[CRYPTO_MAX_NAME];
+};
+
+struct crypto_report_kpp {
+	char type[CRYPTO_MAX_NAME];
+};
+
+struct crypto_report_acomp {
+	char type[CRYPTO_MAX_NAME];
+};
+
+#define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
+			       sizeof(struct crypto_report_blkcipher))
 
 #define CR_RTA(x)  ((struct rtattr*)(((char*)(x)) + NLMSG_ALIGN(sizeof(struct crypto_user_alg))))
 

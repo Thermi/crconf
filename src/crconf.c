@@ -159,7 +159,7 @@ int crconf_update_driver(int argc, char **argv)
 	if (rtnl_open_byproto(&rth, 0, NETLINK_CRYPTO) < 0)
 		exit(1);
 
-	if (rtnl_talk(&rth, &req.n, 0, 0, NULL, NULL, NULL) < 0)
+	if (rtnl_talk(&rth, &req.n, NULL) < 0)
 		exit(2);
 
 	rtnl_close(&rth);
@@ -219,7 +219,7 @@ static int crconf_del_driver(int argc, char **argv)
 	if (rtnl_open_byproto(&rth, 0, NETLINK_CRYPTO) < 0)
 		exit(1);
 
-	if (rtnl_talk(&rth, &req.n, 0, 0, NULL, NULL, NULL) < 0)
+	if (rtnl_talk(&rth, &req.n, NULL) < 0)
 		exit(2);
 
 	rtnl_close(&rth);
@@ -275,7 +275,7 @@ static int crconf_add_alg(int argc, char **argv)
 	if (rtnl_open_byproto(&rth, 0, NETLINK_CRYPTO) < 0)
 		exit(1);
 
-	if (rtnl_talk(&rth, &req.n, 0, 0, NULL, NULL, NULL) < 0)
+	if (rtnl_talk(&rth, &req.n, NULL) < 0)
 		exit(2);
 
 	rtnl_close(&rth);
@@ -325,7 +325,7 @@ static int crconf_add_driver(int argc, char **argv)
 	if (rtnl_open_byproto(&rth, 0, NETLINK_CRYPTO) < 0)
 		exit(1);
 
-	if (rtnl_talk(&rth, &req.n, 0, 0, NULL, NULL, NULL) < 0)
+	if (rtnl_talk(&rth, &req.n, NULL) < 0)
 		exit(2);
 
 	rtnl_close(&rth);
@@ -509,7 +509,7 @@ static int crconf_show_all(int argc, char **argv)
 	if (rtnl_wilddump_request(&rth, AF_UNSPEC, CRYPTO_MSG_GETALG) < 0)
 		exit(1);
 
-	if (rtnl_dump_filter(&rth, crypto_alg_print, stdout, NULL, NULL) < 0)
+	if (rtnl_dump_filter(&rth, crypto_alg_print, stdout) < 0)
 		exit(1);
 
 	rtnl_close(&rth);
@@ -521,8 +521,7 @@ static int crconf_show_all(int argc, char **argv)
 static int crconf_show_driver(int argc, char **argv)
 {
 	struct rtnl_handle rth;
-	char buf[NLMSG_BUF_SIZE];
-	struct nlmsghdr *res_n = (struct nlmsghdr *)buf;
+	struct nlmsghdr *res_n = NULL;
 	struct {
 		struct nlmsghdr n;
 		struct crypto_user_alg cru;
@@ -534,7 +533,6 @@ static int crconf_show_driver(int argc, char **argv)
 	}
 
 	memset(&req, 0, sizeof(req));
-	memset(&buf, 0, sizeof(buf));
 
 	req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.cru));
 	req.n.nlmsg_flags = NLM_F_REQUEST;
@@ -560,12 +558,13 @@ static int crconf_show_driver(int argc, char **argv)
 	if (rtnl_open_byproto(&rth, 0, NETLINK_CRYPTO) < 0)
 		exit(1);
 
-	if (rtnl_talk(&rth, &req.n, 0, 0, res_n, NULL, NULL) < 0)
+	if (rtnl_talk(&rth, &req.n, &res_n) < 0)
 		exit(2);
 
 	if (crypto_alg_print(NULL, res_n, (void*)stdout) < 0)
 		exit(1);
 
+	free(res_n);
 	rtnl_close(&rth);
 
 	return 0;
