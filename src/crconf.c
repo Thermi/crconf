@@ -136,16 +136,16 @@ int crconf_update_driver(int argc, char **argv)
 	req.n.nlmsg_flags = NLM_F_REQUEST;
 	req.n.nlmsg_type = CRYPTO_MSG_UPDATEALG;
 
-	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
 	copy_name(req.cru.cru_driver_name, argv[0],
 		  sizeof(req.cru.cru_driver_name));
 	argc--;
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0)
+		if (strcmp(*argv, "type") == 0) {
 			get_u32(&argc, &argv, &req.cru.cru_type, "type");
-		else if (strcmp(*argv, "priority") == 0) {
+			req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
+		} else if (strcmp(*argv, "priority") == 0) {
 			__u32 prio;
 			get_u32(&argc, &argv, &prio, "priority");
 			addattr32(&req.n, sizeof(req), CRYPTOCFGA_PRIORITY_VAL, prio);
@@ -200,17 +200,18 @@ static int crconf_del_driver(int argc, char **argv)
 	req.n.nlmsg_flags = NLM_F_REQUEST;
 	req.n.nlmsg_type = CRYPTO_MSG_DELALG;
 
-	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
 	copy_name(req.cru.cru_driver_name, argv[0],
 		  sizeof(req.cru.cru_driver_name));
 	argc--;
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0)
+		if (strcmp(*argv, "type") == 0) {
 			get_u32(&argc, &argv, &req.cru.cru_type, "type");
-		else
+			req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
+		} else {
 			invarg(*argv);
+		}
 
 		argc--;
 		argv++;
@@ -257,16 +258,17 @@ static int crconf_add_alg(int argc, char **argv)
 	req.n.nlmsg_flags = NLM_F_REQUEST;
 	req.n.nlmsg_type = CRYPTO_MSG_NEWALG;
 
-	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
 	copy_name(req.cru.cru_name, argv[0], sizeof(req.cru.cru_name));
 	argc--;
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0)
+		if (strcmp(*argv, "type") == 0) {
 			get_u32(&argc, &argv, &req.cru.cru_type, "type");
-		else
+			req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
+		} else {
 			invarg(*argv);
+		}
 
 		argc--;
 		argv++;
@@ -302,16 +304,16 @@ static int crconf_add_driver(int argc, char **argv)
 	req.n.nlmsg_flags = NLM_F_REQUEST;
 	req.n.nlmsg_type = CRYPTO_MSG_NEWALG;
 
-	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
 	copy_name(req.cru.cru_driver_name, argv[0],
 		 sizeof(req.cru.cru_driver_name));
 	argc--;
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0)
+		if (strcmp(*argv, "type") == 0) {
 			get_u32(&argc, &argv, &req.cru.cru_type, "type");
-		else if (strcmp(*argv, "priority") == 0) {
+			req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
+		} else if (strcmp(*argv, "priority") == 0) {
 			__u32 prio;
 			get_u32(&argc, &argv, &prio, "priority");
 			addattr32(&req.n, sizeof(req), CRYPTOCFGA_PRIORITY_VAL, prio);
@@ -538,7 +540,6 @@ static int crconf_show_driver(int argc, char **argv)
 	req.n.nlmsg_flags = NLM_F_REQUEST;
 	req.n.nlmsg_type = CRYPTO_MSG_GETALG;
 
-	req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
 	copy_name(req.cru.cru_driver_name, argv[0],
 		  sizeof(req.cru.cru_driver_name));
 
@@ -546,10 +547,12 @@ static int crconf_show_driver(int argc, char **argv)
 	argv++;
 
 	while (argc > 0) {
-		if (strcmp(*argv, "type") == 0)
+		if (strcmp(*argv, "type") == 0) {
 			get_u32(&argc, &argv, &req.cru.cru_type, "type");
-		else
+			req.cru.cru_mask = CRYPTO_ALG_TYPE_MASK;
+		} else {
 			invarg(*argv);
+		}
 
 		argc--;
 		argv++;
