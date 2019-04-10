@@ -110,12 +110,13 @@ static void get_u32(int *pargc, char ***pargv, __u32 *val, const char *what)
 
 static void copy_name(char *dst, char *src, size_t maxlen)
 {
-	if (strlen(src) >= maxlen) {
+	if (maxlen >= strlen(src)+1) {
+		strncpy(dst, src, maxlen);
+	} else {
 		fprintf(stderr, "Algorithm/Driver name '%s' too long, max "
 			"length %zu!\n", src, maxlen - 1);
 		exit(-1);
 	}
-	strncpy(dst, src, strlen(src));
 }
 
 int crconf_update_driver(int argc, char **argv)
