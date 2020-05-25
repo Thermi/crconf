@@ -19,36 +19,31 @@
  * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#ifndef _LINUX_CRYPTOUSER_H
+#define _LINUX_CRYPTOUSER_H
+
 #include <linux/types.h>
 #include <libnetlink.h>
 
-#define CRYPTO_MAX_ALG_NAME 64
-#define NLMSG_BUF_SIZE 4096
-
-/*  
- * Algorithm masks and types. 
- */ 
+/*
+ * Algorithm masks and types.
+ */
 #define CRYPTO_ALG_TYPE_MASK		0x0000000f
 #define CRYPTO_ALG_TYPE_CIPHER		0x00000001
 #define CRYPTO_ALG_TYPE_COMPRESS	0x00000002
 #define CRYPTO_ALG_TYPE_AEAD		0x00000003
-#define CRYPTO_ALG_TYPE_BLKCIPHER	0x00000004
-#define CRYPTO_ALG_TYPE_ABLKCIPHER	0x00000005
 #define CRYPTO_ALG_TYPE_SKCIPHER	0x00000005
-#define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
 #define CRYPTO_ALG_TYPE_KPP		0x00000008
 #define CRYPTO_ALG_TYPE_ACOMPRESS	0x0000000a
 #define CRYPTO_ALG_TYPE_SCOMPRESS	0x0000000b
 #define CRYPTO_ALG_TYPE_RNG		0x0000000c
 #define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
-#define CRYPTO_ALG_TYPE_DIGEST		0x0000000e
 #define CRYPTO_ALG_TYPE_HASH		0x0000000e
 #define CRYPTO_ALG_TYPE_SHASH		0x0000000e
 #define CRYPTO_ALG_TYPE_AHASH		0x0000000f
 
 #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
 #define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000e
-#define CRYPTO_ALG_TYPE_BLKCIPHER_MASK	0x0000000c
 #define CRYPTO_ALG_TYPE_ACOMPRESS_MASK	0x0000000e
 
 #define CRYPTO_ALG_LARVAL		0x00000010
@@ -63,12 +58,6 @@
 #define CRYPTO_ALG_NEED_FALLBACK	0x00000100
 
 /*
- * This bit is set for symmetric key ciphers that have already been wrapped
- * with a generic IV generator to prevent them from being wrapped again.
- */
-#define CRYPTO_ALG_GENIV		0x00000200
-
-/*
  * Set if the algorithm has passed automated run-time testing.  Note that
  * if there is no run-time testing for a given algorithm it is considered
  * to have passed.
@@ -77,7 +66,7 @@
 #define CRYPTO_ALG_TESTED		0x00000400
 
 /*
- * Set if the algorithm is an instance that is build from telplates.
+ * Set if the algorithm is an instance that is built from templates.
  */
 #define CRYPTO_ALG_INSTANCE		0x00000800
 
@@ -89,6 +78,7 @@ enum {
 	CRYPTO_MSG_UPDATEALG,
 	CRYPTO_MSG_GETALG,
 	CRYPTO_MSG_DELRNG,
+	CRYPTO_MSG_GETSTAT,
 	__CRYPTO_MSG_MAX
 };
 #define CRYPTO_MSG_MAX (__CRYPTO_MSG_MAX - 1)
@@ -110,6 +100,16 @@ enum crypto_attr_type_t {
 	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
 	CRYPTOCFGA_REPORT_KPP,		/* struct crypto_report_kpp */
 	CRYPTOCFGA_REPORT_ACOMP,	/* struct crypto_report_acomp */
+	CRYPTOCFGA_STAT_LARVAL,		/* struct crypto_stat */
+	CRYPTOCFGA_STAT_HASH,		/* struct crypto_stat */
+	CRYPTOCFGA_STAT_BLKCIPHER,	/* struct crypto_stat */
+	CRYPTOCFGA_STAT_AEAD,		/* struct crypto_stat */
+	CRYPTOCFGA_STAT_COMPRESS,	/* struct crypto_stat */
+	CRYPTOCFGA_STAT_RNG,		/* struct crypto_stat */
+	CRYPTOCFGA_STAT_CIPHER,		/* struct crypto_stat */
+	CRYPTOCFGA_STAT_AKCIPHER,	/* struct crypto_stat */
+	CRYPTOCFGA_STAT_KPP,		/* struct crypto_stat */
+	CRYPTOCFGA_STAT_ACOMP,		/* struct crypto_stat */
 	__CRYPTOCFGA_MAX
 
 #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
@@ -123,6 +123,71 @@ struct crypto_user_alg {
 	__u32 cru_mask;
 	__u32 cru_refcnt;
 	__u32 cru_flags;
+};
+
+struct crypto_stat_aead {
+	char type[CRYPTO_MAX_NAME];
+	__u64 stat_encrypt_cnt;
+	__u64 stat_encrypt_tlen;
+	__u64 stat_decrypt_cnt;
+	__u64 stat_decrypt_tlen;
+	__u64 stat_err_cnt;
+};
+
+struct crypto_stat_akcipher {
+	char type[CRYPTO_MAX_NAME];
+	__u64 stat_encrypt_cnt;
+	__u64 stat_encrypt_tlen;
+	__u64 stat_decrypt_cnt;
+	__u64 stat_decrypt_tlen;
+	__u64 stat_verify_cnt;
+	__u64 stat_sign_cnt;
+	__u64 stat_err_cnt;
+};
+
+struct crypto_stat_cipher {
+	char type[CRYPTO_MAX_NAME];
+	__u64 stat_encrypt_cnt;
+	__u64 stat_encrypt_tlen;
+	__u64 stat_decrypt_cnt;
+	__u64 stat_decrypt_tlen;
+	__u64 stat_err_cnt;
+};
+
+struct crypto_stat_compress {
+	char type[CRYPTO_MAX_NAME];
+	__u64 stat_compress_cnt;
+	__u64 stat_compress_tlen;
+	__u64 stat_decompress_cnt;
+	__u64 stat_decompress_tlen;
+	__u64 stat_err_cnt;
+};
+
+struct crypto_stat_hash {
+	char type[CRYPTO_MAX_NAME];
+	__u64 stat_hash_cnt;
+	__u64 stat_hash_tlen;
+	__u64 stat_err_cnt;
+};
+
+struct crypto_stat_kpp {
+	char type[CRYPTO_MAX_NAME];
+	__u64 stat_setsecret_cnt;
+	__u64 stat_generate_public_key_cnt;
+	__u64 stat_compute_shared_secret_cnt;
+	__u64 stat_err_cnt;
+};
+
+struct crypto_stat_rng {
+	char type[CRYPTO_MAX_NAME];
+	__u64 stat_generate_cnt;
+	__u64 stat_generate_tlen;
+	__u64 stat_seed_cnt;
+	__u64 stat_err_cnt;
+};
+
+struct crypto_stat_larval {
+	char type[CRYPTO_MAX_NAME];
 };
 
 struct crypto_report_larval {
@@ -183,5 +248,4 @@ struct crypto_report_acomp {
 #define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
 			       sizeof(struct crypto_report_blkcipher))
 
-#define CR_RTA(x)  ((struct rtattr*)(((char*)(x)) + NLMSG_ALIGN(sizeof(struct crypto_user_alg))))
-
+#endif /* _LINUX_CRYPTOUSER_H */

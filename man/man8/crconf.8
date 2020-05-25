@@ -48,23 +48,20 @@ CRYPTO_ALG_TYPE_COMPRESS        2
 .br
 CRYPTO_ALG_TYPE_AEAD            3
 .br
-CRYPTO_ALG_TYPE_BLKCIPHER       4
+CRYPTO_ALG_TYPE_SKCIPHER        5
 .br
-CRYPTO_ALG_TYPE_ABLKCIPHER      5
-.br
-CRYPTO_ALG_TYPE_GIVCIPHER       6
-.br
-CRYPTO_ALG_TYPE_DIGEST          8
-.br
-CRYPTO_ALG_TYPE_HASH            8
-.br
-CRYPTO_ALG_TYPE_SHASH           9
-.br
-CRYPTO_ALG_TYPE_AHASH           10
+CRYPTO_ALG_TYPE_KPP             8
 .br
 CRYPTO_ALG_TYPE_RNG             12
 .br
-CRYPTO_ALG_TYPE_PCOMPRESS       15
+CRYPTO_ALG_TYPE_AKCIPHER        13
+.br
+CRYPTO_ALG_TYPE_HASH            14
+.br
+CRYPTO_ALG_TYPE_SHASH           14
+.br
+CRYPTO_ALG_TYPE_AHASH           15
+.br
 
 .SH ALGORITHM DRIVER PRIORITY
 The priority of an algorithm driver determines which driver will be used if
@@ -108,5 +105,6 @@ Only valid for the
 .B show
 command.
 
-.SH AUTHOR
+.SH AUTHORS
 Steffen Klassert <steffen.klassert@secunet.com>
+Horia Geantă <horia.geanta@nxp.com>

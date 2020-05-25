@@ -28,6 +28,8 @@
 #include <linux/netlink.h>
 #include <libnetlink.h>
 
+#define CR_RTA(x)  ((struct rtattr*)(((char*)(x)) + NLMSG_ALIGN(sizeof(struct crypto_user_alg))))
+
 static void usage(void) __attribute__((noreturn));
 
 static void usage(void)
@@ -42,25 +44,54 @@ static void usage(void)
 			"DRIVER := driver <driver-name>\n"
 			"TYPE := type ALGO-TYPE\n"
 			"PRIORITY := priority <number>\n"
-			"ALGO-TYPE := { 1 | 2 | 3 | 4 | 5 | 6 | 8 | 9 | 10 | 12 | 15 }\n"
+			"ALGO-TYPE := { 1 | 2 | 3 | 5 | 8 | 10 | 11 | 12 | 13 | 14 | 15 }\n"
 			"               1 == alg type cipher\n"
 			"               2 == alg type compress\n"
 			"               3 == alg type aead\n"
-			"               4 == alg type blkcipher\n"
-			"               5 == alg type ablkcipher\n"
-			"               6 == alg type givcipher\n"
-			"               8 == alg type digest\n"
-			"               8 == alg type hash\n"
-			"               9 == alg type shash\n"
-			"              10 == alg type ahash\n"
+			"               5 == alg type skcipher\n"
+			"               8 == alg type kpp\n"
+			"              10 == alg type acompress\n"
+			"              11 == alg type scompress\n"
 			"              12 == alg type rng\n"
-			"              15 == alg type pcompress\n");
+			"              13 == alg type akcipher\n"
+			"              14 == alg type hash\n"
+			"              14 == alg type shash\n"
+			"              15 == alg type ahash\n");
 	exit(-1);
 }
 
 static int crconf_help(int argc, char **argv)
 {
 	usage();
+}
+
+/* Functions that were removed at some point from iproute2's libnetlink.c */
+int rtnl_wilddump_req_filter(struct rtnl_handle *rth, int family, int type,
+			    __u32 filt_mask)
+{
+	struct {
+		struct nlmsghdr nlh;
+		struct ifinfomsg ifm;
+		/* attribute has to be NLMSG aligned */
+		struct rtattr ext_req __attribute__ ((aligned(NLMSG_ALIGNTO)));
+		__u32 ext_filter_mask;
+	} req = {
+		.nlh.nlmsg_len = sizeof(req),
+		.nlh.nlmsg_type = type,
+		.nlh.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST,
+		.nlh.nlmsg_seq = rth->dump = ++rth->seq,
+		.ifm.ifi_family = family,
+		.ext_req.rta_type = IFLA_EXT_MASK,
+		.ext_req.rta_len = RTA_LENGTH(sizeof(__u32)),
+		.ext_filter_mask = filt_mask,
+	};
+
+	return send(rth->fd, &req, sizeof(req), 0);
+}
+
+int rtnl_wilddump_request(struct rtnl_handle *rth, int family, int type)
+{
+	return rtnl_wilddump_req_filter(rth, family, type, RTEXT_FILTER_VF);
 }
 
 /* These helper functions are borrowed from utils.c as it comes with iproute2. */
@@ -468,7 +499,7 @@ static void crypto_alg_print_attr(struct rtattr *tb[], FILE *fp)
 	}
 }
 
-static int crypto_alg_print(const struct sockaddr_nl *who, struct nlmsghdr *n, void *arg)
+static int crypto_alg_print(struct nlmsghdr *n, void *arg)
 {
 	FILE *fp = (FILE*)arg;
 	struct rtattr * tb[CRYPTOCFGA_MAX+1];
@@ -564,7 +595,7 @@ static int crconf_show_driver(int argc, char **argv)
 	if (rtnl_talk(&rth, &req.n, &res_n) < 0)
 		exit(2);
 
-	if (crypto_alg_print(NULL, res_n, (void*)stdout) < 0)
+	if (crypto_alg_print(res_n, (void*)stdout) < 0)
 		exit(1);
 
 	free(res_n);
