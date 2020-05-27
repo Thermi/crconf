@@ -115,7 +115,7 @@ static void copy_name(char *dst, char *src, size_t maxlen)
 			"length %zu!\n", src, maxlen - 1);
 		exit(-1);
 	}
-	strncpy(dst, src, strlen(src));
+	strcpy(dst, src);
 }
 
 int crconf_update_driver(int argc, char **argv)
